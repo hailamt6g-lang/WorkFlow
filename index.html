@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WorkFlow - Tổng Quan</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-dark text-light" x-data="{ 
+    user: null,
+    projects: [],
+    init() {
+        const sess = localStorage.getItem('wf_session');
+        if (!sess) {
+            window.location.href = 'login.html';
+            return;
+        }
+        this.user = JSON.parse(sess);
+        this.projects = JSON.parse(localStorage.getItem('wf_projects_' + this.user.username) || '[]');
+    },
+    logout() {
+        localStorage.removeItem('wf_session');
+        window.location.href = 'login.html';
+    }
+}">
+
+    <div class="d-flex flex-column min-vh-100 page-animate" x-show="user">
+        
+        <div class="collapse" id="navbarToggleExternalContent" data-bs-theme="dark">
+            <div class="bg-dark p-4 border-bottom border-secondary-subtle">
+                <h5 class="text-body-emphasis h4"><i class="fa-solid fa-diagram-project text-emerald me-2"></i>WorkFlow Menu</h5>
+                <span class="text-body-secondary d-block mb-3">Hệ thống quản lý công việc & phân quyền.</span>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="index.html" class="btn btn-emerald btn-sm"><i class="fa-solid fa-house me-1"></i> Tổng Quan</a>
+                    <a href="projects.html" class="btn btn-outline-emerald btn-sm"><i class="fa-solid fa-folder-open me-1"></i> Danh Sách Dự Án</a>
+                    
+                    <template x-if="user?.role === 'admin'">
+                        <a href="admin.html" class="btn btn-warning btn-sm text-dark fw-bold"><i class="fa-solid fa-users-gear me-1"></i> Quản Lý Tài Khoản (Admin)</a>
+                    </template>
+
+                    <button @click="logout()" class="btn btn-secondary btn-sm ms-auto"><i class="fa-solid fa-right-from-bracket me-1"></i> Đăng Xuất</button>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="navbar navbar-dark bg-dark border-bottom border-secondary-subtle px-3">
+            <div class="container-fluid p-0">
+                <div class="d-flex align-items-center gap-2">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <span class="navbar-brand mb-0 h1 fw-bold text-emerald"><i class="fa-solid fa-diagram-project me-1"></i> WorkFlow</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge" :class="user?.role === 'admin' ? 'bg-warning text-dark' : 'bg-dark text-emerald border border-emerald-subtle'" x-text="user?.role === 'admin' ? 'ADMIN' : 'USER'"></span>
+                    <span class="badge bg-dark text-light border border-secondary-subtle rounded-pill px-3 py-2">
+                        <i class="fa-solid fa-user text-emerald me-1"></i> @<span x-text="user?.username"></span>
+                    </span>
+                </div>
+            </div>
+        </nav>
+
+        <main class="content-body p-4 flex-grow-1">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h3 class="fw-bold mb-1">Xin chào 👋, <span x-text="user?.name"></span></h3>
+                    <p class="text-secondary fs-7 mb-0">Theo dõi danh mục ưu tiên và quản lý công việc của bạn</p>
+                </div>
+
+                <a href="projects.html" class="btn btn-emerald px-4 py-2.5 rounded-3 fw-bold">
+                    <i class="fa-solid fa-plus me-2"></i> Tạo Dự Án & Công Việc
+                </a>
+            </div>
+
+            <div class="human-card p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom border-secondary-subtle">
+                    <h5 class="fw-bold mb-0 text-emerald">
+                        <i class="fa-solid fa-fire text-warning me-2"></i> Công Việc Ưu Tiên Cao (Gấp)
+                    </h5>
+                    <a href="projects.html" class="btn btn-outline-emerald btn-sm rounded-pill px-3">
+                        Xem Tất Cả Dự Án <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+
+                <div class="row g-3">
+                    <template x-if="projects.length === 0">
+                        <div class="col-12 text-center py-5">
+                            <i class="fa-solid fa-folder-open fs-1 text-secondary mb-3"></i>
+                            <p class="text-secondary mb-2">Tài khoản này chưa có dự án nào.</p>
+                            <a href="projects.html" class="btn btn-emerald btn-sm fw-bold">Tạo dự án ngay</a>
+                        </div>
+                    </template>
+
+                    <template x-for="p in projects" :key="p.id">
+                        <template x-for="t in p.tasks.filter(task => task.status === 'Gấp')" :key="t.name">
+                            <div class="col-md-6 col-lg-4">
+                                <div class="bg-black border border-warning-subtle p-3 rounded-3 h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-warning text-dark fw-bold fs-8">GẤP</span>
+                                            <small class="text-secondary"><i class="fa-regular fa-calendar me-1"></i> <span x-text="t.due || 'Chưa có hạn'"></span></small>
+                                        </div>
+                                        <h6 class="fw-bold mb-2" x-text="t.name"></h6>
+                                        <p class="text-emerald fs-7 mb-3"><i class="fa-solid fa-folder me-1"></i> Dự án: <span x-text="p.name"></span></p>
+                                    </div>
+                                    <a href="projects.html" class="btn btn-outline-emerald btn-sm w-100 text-center">Tới Dự Án</a>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-black border-top border-secondary-subtle px-4 py-3 text-secondary fs-7 d-flex justify-content-between">
+            <span>© 2026 WorkFlow.</span>
+            <span class="text-emerald"><i class="fa-solid fa-circle fs-8 me-1 pulse-emerald"></i> Online</span>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

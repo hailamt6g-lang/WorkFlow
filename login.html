@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WorkFlow - Đăng Nhập / Đăng Ký</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-dark text-light" x-data="{
+    tab: 'login',
+    username: '',
+    password: '',
+    showLoginPass: false,
+    fullname: '',
+    regUsername: '',
+    regPassword: '',
+    showRegPass: false,
+    errorMsg: '',
+    successMsg: '',
+    init() {
+        let users = JSON.parse(localStorage.getItem('wf_users') || 'null');
+        if (!users) {
+            users = {
+                'admin': { name: 'Quản Trị Viên', password: 'admin123', role: 'admin' }
+            };
+            localStorage.setItem('wf_users', JSON.stringify(users));
+        }
+    },
+    handleLogin() {
+        this.errorMsg = '';
+        const users = JSON.parse(localStorage.getItem('wf_users') || '{}');
+        const userKey = this.username.trim().toLowerCase();
+        
+        if (!users[userKey] || users[userKey].password !== this.password) {
+            this.errorMsg = 'Tên đăng nhập hoặc mật khẩu không chính xác!';
+            return;
+        }
+        localStorage.setItem('wf_session', JSON.stringify({ 
+            username: userKey, 
+            name: users[userKey].name,
+            role: users[userKey].role || 'user'
+        }));
+        window.location.href = 'index.html';
+    },
+    handleRegister() {
+        this.errorMsg = '';
+        this.successMsg = '';
+        if (!this.regUsername || !this.regPassword || !this.fullname) {
+            this.errorMsg = 'Vui lòng nhập đầy đủ thông tin!';
+            return;
+        }
+        const users = JSON.parse(localStorage.getItem('wf_users') || '{}');
+        const newUserKey = this.regUsername.trim().toLowerCase();
+
+        if (users[newUserKey]) {
+            this.errorMsg = 'Tên đăng nhập này đã tồn tại!';
+            return;
+        }
+        users[newUserKey] = { name: this.fullname, password: this.regPassword, role: 'user' };
+        localStorage.setItem('wf_users', JSON.stringify(users));
+        
+        if (!localStorage.getItem('wf_projects_' + newUserKey)) {
+            localStorage.setItem('wf_projects_' + newUserKey, JSON.stringify([]));
+        }
+
+        this.username = newUserKey;
+        this.password = '';
+        this.successMsg = 'Đăng ký thành công! Vui lòng đăng nhập.';
+        this.tab = 'login';
+        this.regUsername = '';
+        this.regPassword = '';
+        this.fullname = '';
+    }
+}">
+
+    <div class="d-flex align-items-center justify-content-center min-vh-100 p-3 page-animate">
+        <div class="human-card p-4 p-md-5 w-100" style="max-width: 430px;">
+            <div class="text-center mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-emerald-subtle text-emerald rounded-4 p-3 mb-3">
+                    <i class="fa-solid fa-diagram-project fs-2"></i>
+                </div>
+                <h3 class="fw-bold mb-1">WorkFlow</h3>
+                <p class="text-secondary fs-7" x-text="tab === 'login' ? 'Đăng nhập vào hệ thống làm việc' : 'Tạo tài khoản người dùng mới'"></p>
+            </div>
+
+            <div class="d-flex bg-black p-1 rounded-3 mb-4 border border-secondary-subtle">
+                <button type="button" class="btn w-50 py-2 fs-7 fw-bold" :class="tab === 'login' ? 'btn-emerald' : 'text-secondary'" @click="tab = 'login'; errorMsg = ''; successMsg = '';">Đăng Nhập</button>
+                <button type="button" class="btn w-50 py-2 fs-7 fw-bold" :class="tab === 'register' ? 'btn-emerald' : 'text-secondary'" @click="tab = 'register'; errorMsg = ''; successMsg = '';">Đăng Ký</button>
+            </div>
+
+            <template x-if="errorMsg">
+                <div class="alert alert-danger fs-7 py-2" role="alert" x-text="errorMsg"></div>
+            </template>
+            <template x-if="successMsg">
+                <div class="alert alert-success fs-7 py-2" role="alert" x-text="successMsg"></div>
+            </template>
+
+            <!-- FORM ĐĂNG NHẬP -->
+            <form x-show="tab === 'login'" @submit.prevent="handleLogin()">
+                <div class="mb-3">
+                    <label class="form-label text-secondary fs-7 fw-medium">Tên đăng nhập</label>
+                    <input type="text" class="form-control bg-black text-light border-secondary-subtle py-2.5" placeholder="Nhập tên đăng nhập" x-model="username" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-secondary fs-7 fw-medium">Mật khẩu</label>
+                    <input :type="showLoginPass ? 'text' : 'password'" class="form-control bg-black text-light border-secondary-subtle py-2.5" placeholder="Nhập mật khẩu" x-model="password" required>
+                    
+                    <!-- Checkbox hiện mật khẩu ngay dưới ô nhập -->
+                    <div class="form-check mt-2">
+                        <input class="form-check-input bg-black border-secondary-subtle" type="checkbox" id="chkShowLogin" x-model="showLoginPass">
+                        <label class="form-check-label text-secondary fs-7 user-select-none" for="chkShowLogin">
+                            Hiện mật khẩu
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-emerald w-100 py-2.5 fw-bold mt-2">
+                    Vào Hệ Thống <i class="fa-solid fa-arrow-right ms-2"></i>
+                </button>
+            </form>
+
+            <!-- FORM ĐĂNG KÝ -->
+            <form x-show="tab === 'register'" @submit.prevent="handleRegister()">
+                <div class="mb-3">
+                    <!-- Đã đổi nhãn thành "Tên hiển thị" -->
+                    <label class="form-label text-secondary fs-7 fw-medium">Tên hiển thị</label>
+                    <input type="text" class="form-control bg-black text-light border-secondary-subtle py-2.5" placeholder="Ví dụ: Nguyễn Văn A" x-model="fullname" required>
+                </div>
+
+                <div class="mb-3">
+                    <!-- Đã đổi nhãn thành "Tên đăng nhập" -->
+                    <label class="form-label text-secondary fs-7 fw-medium">Tên đăng nhập</label>
+                    <input type="text" class="form-control bg-black text-light border-secondary-subtle py-2.5" placeholder="Ví dụ: van_a_99" x-model="regUsername" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-secondary fs-7 fw-medium">Mật khẩu</label>
+                    <input :type="showRegPass ? 'text' : 'password'" class="form-control bg-black text-light border-secondary-subtle py-2.5" placeholder="Nhập mật khẩu mới" x-model="regPassword" required>
+                    
+                    <!-- Checkbox hiện mật khẩu ngay dưới ô nhập -->
+                    <div class="form-check mt-2">
+                        <input class="form-check-input bg-black border-secondary-subtle" type="checkbox" id="chkShowReg" x-model="showRegPass">
+                        <label class="form-check-label text-secondary fs-7 user-select-none" for="chkShowReg">
+                            Hiện mật khẩu
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-emerald w-100 py-2.5 fw-bold mt-2">
+                    Đăng Ký Tài Khoản
+                </button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

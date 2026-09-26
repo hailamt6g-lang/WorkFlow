@@ -1,0 +1,96 @@
+/* ==========================================================================
+   WORKFLOW STYLESHEET - BOOTSTRAP 5 EMERALD DARK THEME
+   ========================================================================== */
+
+:root {
+    --emerald: #10b981;
+    --emerald-hover: #059669;
+    --emerald-glow: rgba(16, 185, 129, 0.25);
+    --emerald-subtle: rgba(16, 185, 129, 0.1);
+    --bg-main: #0b0f17;
+    --bg-card: #111827;
+    --border-color: #1e293b;
+    --text-muted: #94a3b8;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-main) !important;
+    color: #f8fafc;
+    overflow-x: hidden;
+}
+
+.page-animate {
+    animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.text-emerald { color: var(--emerald) !important; }
+.bg-emerald { background-color: var(--emerald) !important; color: #000 !important; }
+.bg-emerald-subtle { background-color: var(--emerald-subtle) !important; }
+
+.btn-emerald {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #000;
+    border: none;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px var(--emerald-glow);
+}
+
+.btn-emerald:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    color: #fff;
+}
+
+.btn-outline-emerald {
+    border: 1px solid var(--emerald);
+    color: var(--emerald);
+    background: transparent;
+    transition: all 0.25s ease;
+}
+
+.btn-outline-emerald:hover {
+    background-color: var(--emerald);
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px var(--emerald-glow);
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #000 !important;
+    border-color: var(--emerald) !important;
+    box-shadow: 0 0 0 0.25rem var(--emerald-subtle) !important;
+    color: #fff !important;
+}
+
+.human-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.human-card:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+}
+
+.pulse-emerald { animation: pulse 2s infinite; }
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Style cho hàng được chọn trong bảng */
+tr.table-active-row {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    border-left: 3px solid var(--emerald);
+}

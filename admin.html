@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WorkFlow - Quản Lý Tài Khoản Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-dark text-light" x-data="{ 
+    user: null,
+    usersList: {},
+    showPass: {},
+    init() {
+        const sess = localStorage.getItem('wf_session');
+        if (!sess) {
+            window.location.href = 'login.html';
+            return;
+        }
+        this.user = JSON.parse(sess);
+        
+        if (this.user.role !== 'admin') {
+            alert('Bạn không có quyền truy cập trang Admin!');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        this.loadUsers();
+    },
+    loadUsers() {
+        this.usersList = JSON.parse(localStorage.getItem('wf_users') || '{}');
+    },
+    saveUsers() {
+        localStorage.setItem('wf_users', JSON.stringify(this.usersList));
+    },
+    toggleShowPassword(uname) {
+        this.showPass[uname] = !this.showPass[uname];
+    },
+    changeRole(uname, newRole) {
+        this.usersList[uname].role = newRole;
+        this.saveUsers();
+        if (uname === this.user.username) {
+            this.user.role = newRole;
+            localStorage.setItem('wf_session', JSON.stringify(this.user));
+        }
+    },
+    deleteUser(uname) {
+        if (uname === this.user.username) {
+            alert('Bạn không thể xóa tài khoản Admin đang đăng nhập!');
+            return;
+        }
+        if (confirm('Bạn có chắc chắn muốn xóa tài khoản ' + uname + '? Toàn bộ dữ liệu dự án của tài khoản này cũng sẽ bị xóa vĩnh viễn!')) {
+            delete this.usersList[uname];
+            localStorage.removeItem('wf_projects_' + uname);
+            this.saveUsers();
+        }
+    },
+    logout() {
+        localStorage.removeItem('wf_session');
+        window.location.href = 'login.html';
+    }
+}">
+
+    <div class="d-flex flex-column min-vh-100 page-animate" x-show="user && user.role === 'admin'">
+        
+        <div class="collapse" id="navbarToggleExternalContent" data-bs-theme="dark">
+            <div class="bg-dark p-4 border-bottom border-secondary-subtle">
+                <h5 class="text-body-emphasis h4"><i class="fa-solid fa-diagram-project text-emerald me-2"></i>WorkFlow Menu</h5>
+                <span class="text-body-secondary d-block mb-3">Hệ thống quản lý công việc & phân quyền.</span>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="index.html" class="btn btn-outline-emerald btn-sm"><i class="fa-solid fa-house me-1"></i> Tổng Quan</a>
+                    <a href="projects.html" class="btn btn-outline-emerald btn-sm"><i class="fa-solid fa-folder-open me-1"></i> Danh Sách Dự Án</a>
+                    <a href="admin.html" class="btn btn-warning btn-sm text-dark fw-bold"><i class="fa-solid fa-users-gear me-1"></i> Quản Lý Tài Khoản (Admin)</a>
+                    <button @click="logout()" class="btn btn-secondary btn-sm ms-auto"><i class="fa-solid fa-right-from-bracket me-1"></i> Đăng Xuất</button>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="navbar navbar-dark bg-dark border-bottom border-secondary-subtle px-3">
+            <div class="container-fluid p-0">
+                <div class="d-flex align-items-center gap-2">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <span class="navbar-brand mb-0 h1 fw-bold text-emerald"><i class="fa-solid fa-diagram-project me-1"></i> WorkFlow</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark fw-bold">ADMIN PANEL</span>
+                    <span class="badge bg-dark text-light border border-secondary-subtle rounded-pill px-3 py-2">
+                        <i class="fa-solid fa-user-shield text-warning me-1"></i> @<span x-text="user?.username"></span>
+                    </span>
+                </div>
+            </div>
+        </nav>
+
+        <main class="content-body p-4 flex-grow-1">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h3 class="fw-bold mb-1 text-warning"><i class="fa-solid fa-users-gear me-2"></i>Bảng Quản Lý Tài Khoản</h3>
+                    <p class="text-secondary fs-7 mb-0">Quản trị viên có toàn quyền xem mật khẩu, đổi thông tin và phân quyền hệ thống</p>
+                </div>
+            </div>
+
+            <div class="human-card p-4">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover border border-secondary-subtle align-middle mb-0">
+                        <thead>
+                            <tr class="text-secondary fs-7">
+                                <th>Tên Hiển Thị</th>
+                                <th>Tên Đăng Nhập</th>
+                                <th style="width: 230px;">Mật Khẩu</th>
+                                <th style="width: 150px;">Quyền Hành</th>
+                                <th style="width: 100px;" class="text-center">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="(u, uname) in usersList" :key="uname">
+                                <tr>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm bg-black text-light border-secondary-subtle fw-bold" x-model="u.name" @change="saveUsers()">
+                                    </td>
+                                    <td>
+                                        <span class="fs-7 text-emerald fw-bold" x-text="'@' + uname"></span>
+                                        <template x-if="uname === user.username">
+                                            <span class="badge bg-secondary ms-1 fs-9">Bạn</span>
+                                        </template>
+                                    </td>
+                                    <td>
+                                        <div class="input-group input-group-sm">
+                                            <input :type="showPass[uname] ? 'text' : 'password'" class="form-control bg-black text-light border-secondary-subtle" x-model="u.password" @change="saveUsers()">
+                                            <button class="btn btn-outline-secondary" type="button" @click="toggleShowPassword(uname)">
+                                                <i class="fa-regular" :class="showPass[uname] ? 'fa-eye-slash' : 'fa-eye'"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm bg-black border-secondary-subtle fw-bold" :class="u.role === 'admin' ? 'text-warning' : 'text-emerald'" x-model="u.role" @change="changeRole(uname, $event.target.value)">
+                                            <option value="user" class="text-emerald">User</option>
+                                            <option value="admin" class="text-warning">Admin</option>
+                                        </select>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-outline-danger btn-sm" @click="deleteUser(uname)" :disabled="uname === user.username" title="Xóa tài khoản">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-black border-top border-secondary-subtle px-4 py-3 text-secondary fs-7 d-flex justify-content-between">
+            <span>© 2026 WorkFlow Admin Panel.</span>
+            <span class="text-emerald"><i class="fa-solid fa-circle fs-8 me-1 pulse-emerald"></i> System Online</span>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
