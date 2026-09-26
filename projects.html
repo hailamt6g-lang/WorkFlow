@@ -15,9 +15,8 @@
     activeProject: null,
     selectedTaskIndex: null,
     
-    // Modal tạo mới
+    // Modal tạo mới (Đã bỏ newProjType)
     newProjName: '',
-    newProjType: 'Web App',
     newProjDesc: '',
     newTasks: [
         { name: '', due: '', status: 'Đang Làm' },
@@ -48,7 +47,6 @@
         const p = {
             id: Date.now(),
             name: this.newProjName.trim(),
-            type: this.newProjType,
             desc: this.newProjDesc || 'Chưa có mô tả',
             tasks: this.newTasks.filter(t => t.name.trim() !== '')
         };
@@ -91,7 +89,6 @@
             alert('Vui lòng click chọn một hàng công việc trong bảng để xóa!');
             return;
         }
-        // Xóa hàng đang chọn -> Số thứ tự 1, 2, 3... sẽ tự nhảy lại do x-for lặp qua index
         this.activeProject.tasks.splice(this.selectedTaskIndex, 1);
         this.selectedTaskIndex = null;
         this.saveData();
@@ -118,10 +115,11 @@
 
     <div class="d-flex flex-column min-vh-100 page-animate" x-show="user">
         
+        <!-- MENU BA GẠCH: ĐÃ CẬP NHẬT DÒNG CHỮ CHÚ THÍCH -->
         <div class="collapse" id="navbarToggleExternalContent" data-bs-theme="dark">
             <div class="bg-dark p-4 border-bottom border-secondary-subtle">
                 <h5 class="text-body-emphasis h4"><i class="fa-solid fa-diagram-project text-emerald me-2"></i>WorkFlow Menu</h5>
-                <span class="text-body-secondary d-block mb-3">Hệ thống quản lý công việc & phân quyền.</span>
+                <span class="text-body-secondary d-block mb-3">Hệ thống quản lý công việc một cách đơn giản</span>
                 <div class="d-flex flex-wrap gap-2">
                     <a href="index.html" class="btn btn-outline-emerald btn-sm"><i class="fa-solid fa-house me-1"></i> Tổng Quan</a>
                     <a href="projects.html" class="btn btn-emerald btn-sm"><i class="fa-solid fa-folder-open me-1"></i> Danh Sách Dự Án</a>
@@ -176,13 +174,13 @@
                     </div>
                 </template>
 
-                <!-- KHUNG DỰ ÁN CÁ NHÂN -->
+                <!-- KHUNG DỰ ÁN CÁ NHÂN (Đã bỏ thẻ Loại dự án) -->
                 <template x-for="p in projects" :key="p.id">
                     <div class="col-md-6 col-xl-4">
                         <div class="human-card p-4 h-100 d-flex flex-column justify-content-between">
                             <div>
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="badge bg-emerald-subtle text-emerald"><i class="fa-solid fa-folder me-1"></i> <span x-text="p.type"></span></span>
+                                    <h5 class="fw-bold mb-0 text-emerald" x-text="p.name"></h5>
                                     
                                     <!-- Nút đổi tên và xóa dự án -->
                                     <div class="btn-group">
@@ -194,7 +192,6 @@
                                         </button>
                                     </div>
                                 </div>
-                                <h5 class="fw-bold mb-2" x-text="p.name"></h5>
                                 <p class="text-secondary fs-7 mb-4" x-text="p.desc"></p>
                             </div>
                             
@@ -235,7 +232,6 @@
                             <tbody>
                                 <template x-for="(t, idx) in activeProject?.tasks" :key="idx">
                                     <tr :class="selectedTaskIndex === idx ? 'table-active-row' : ''" @click="selectedTaskIndex = idx" style="cursor: pointer;">
-                                        <!-- Số thứ tự tự động 1, 2, 3... theo biến idx -->
                                         <td class="fw-bold text-emerald text-center" x-text="idx + 1"></td>
                                         <td><input type="text" class="form-control form-control-sm bg-black text-light border-secondary-subtle" x-model="t.name" @input="saveData()" placeholder="Nhập tên công việc..."></td>
                                         <td><input type="date" class="form-control form-control-sm bg-black text-light border-secondary-subtle" x-model="t.due" @change="saveData()"></td>
@@ -256,7 +252,6 @@
                         <button class="btn btn-outline-emerald btn-sm" @click="addTaskToActive()">
                             <i class="fa-solid fa-plus me-1"></i> Thêm Hàng Công Việc
                         </button>
-                        <!-- Nút Xóa Hàng Công Việc Đang Chọn -->
                         <button class="btn btn-outline-danger btn-sm" @click="deleteSelectedTask()">
                             <i class="fa-solid fa-trash-can me-1"></i> Xóa Hàng Công Việc Đang Chọn
                         </button>
@@ -270,7 +265,7 @@
         </div>
     </div>
 
-    <!-- MODAL 2: TẠO DỰ ÁN MỚI -->
+    <!-- MODAL 2: TẠO DỰ ÁN MỚI (Đã bỏ trường Loại dự án) -->
     <div class="modal fade" id="createWizardModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content bg-dark text-light border border-secondary-subtle">
@@ -281,17 +276,9 @@
                 <div class="modal-body p-4">
                     <form>
                         <div class="row g-3 mb-3">
-                            <div class="col-md-8">
+                            <div class="col-12">
                                 <label class="col-form-label text-secondary fw-bold p-0 mb-1">1. Nhập Tên Dự Án</label>
                                 <input type="text" class="form-control bg-black text-light border-secondary-subtle" placeholder="Ví dụ: Xây dựng Website Bán Hàng..." x-model="newProjName">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="col-form-label text-secondary fw-bold p-0 mb-1">Loại Dự Án</label>
-                                <select class="form-select bg-black text-light border-secondary-subtle" x-model="newProjType">
-                                    <option value="Web App">Web App</option>
-                                    <option value="Mobile App">Mobile App</option>
-                                    <option value="System Design">System Design</option>
-                                </select>
                             </div>
                             <div class="col-12">
                                 <label class="col-form-label text-secondary fw-bold p-0 mb-1">Mô Tả Ngắn</label>
