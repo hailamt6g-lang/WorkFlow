@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WorkFlow - Đăng Ký Tài Khoản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-dark text-light">
+
+    <div class="d-flex align-items-center justify-content-center min-vh-100 p-3 page-animate">
+        <div class="human-card p-4 p-md-5 w-100" style="max-width: 420px;">
+            <div class="text-center mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-emerald-subtle text-emerald rounded-4 p-3 mb-3">
+                    <i class="fa-solid fa-user-plus fs-2"></i>
+                </div>
+                <h3 class="fw-bold mb-1">Tạo Tài Khoản</h3>
+                <p class="text-secondary fs-7">Bắt đầu trải nghiệm quản trị công việc WorkFlow</p>
+            </div>
+
+            <div class="d-flex bg-black p-1 rounded-3 mb-4 border border-secondary-subtle">
+                <a href="login.html" class="btn text-secondary w-50 py-2 fs-7 fw-semibold">Đăng Nhập</a>
+                <a href="register.html" class="btn btn-emerald w-50 py-2 fs-7 fw-bold">Đăng Ký</a>
+            </div>
+
+            <form action="index.html" method="GET">
+                <div class="mb-3">
+                    <label class="form-label text-secondary fs-7 fw-medium">Họ và tên</label>
+                    <input type="text" class="form-control bg-black text-light border-secondary-subtle py-2.5" placeholder="Nguyễn Văn A" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-secondary fs-7 fw-medium">Email công việc</label>
+                    <input type="email" class="form-control bg-black text-light border-secondary-subtle py-2.5" placeholder="name@company.com" required>
+                </div>
+
+                <input type="checkbox" id="toggleRegPass" class="password-toggle-checkbox">
+
+                <div class="mb-4 pass-group">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label text-secondary fs-7 fw-medium mb-0">Tạo mật khẩu</label>
+                        <label for="toggleRegPass" class="text-emerald fs-7 cursor-pointer user-select-none">
+                            <span class="eye-icon-open"><i class="fa-regular fa-eye me-1"></i>Hiện</span>
+                            <span class="eye-icon-close"><i class="fa-regular fa-eye-slash me-1"></i>Ẩn</span>
+                        </label>
+                    </div>
+                    <input type="password" class="form-control bg-black text-light border-secondary-subtle py-2.5 pass-field-password" placeholder="Tối thiểu 8 ký tự" required>
+                    <input type="text" class="form-control bg-black text-light border-secondary-subtle py-2.5 pass-field-text" placeholder="Tối thiểu 8 ký tự">
+                </div>
+
+                <button type="submit" class="btn btn-emerald w-100 py-2.5 fw-bold">
+                    Tạo Tài Khoản Mới
+                </button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
